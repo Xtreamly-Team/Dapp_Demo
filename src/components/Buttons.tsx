@@ -80,7 +80,7 @@ export const ConnectButton = (props: ComponentProps<typeof Button>) => {
   return (
     <Button {...props}>
       <FlaskFox />
-      <ButtonText>Connect</ButtonText>
+      <ButtonText>Sign In</ButtonText>
     </Button>
   );
 };
@@ -100,10 +100,10 @@ export const SendVerifiableDataButton = (
   return <Button {...props}>Send Verifiable Data</Button>;
 };
 
-export const SendNotificationButton = (
+export const ShareDataButton = (
   props: ComponentProps<typeof Button>,
 ) => {
-  return <Button {...props}>Send notification</Button>;
+  return <Button {...props}>Share Data</Button>;
 };
 
 export const HeaderButtons = ({

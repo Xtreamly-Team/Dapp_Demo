@@ -1,23 +1,23 @@
-import { useContext } from 'react';
-import styled from 'styled-components';
-import { MetamaskActions, MetaMaskContext } from '../hooks';
+import { useState } from "react";
+import { useContext } from "react";
+import styled from "styled-components";
+import { MetamaskActions, MetaMaskContext } from "../hooks";
 import {
   connectSnap,
   getSnap,
   sendHello,
-  sendNotification,
-  sendNotificationRemote,
-  sendVerifiableData,
   shouldDisplayReconnectButton,
-} from '../utils';
+} from "../utils";
+import { sendNotification } from "../utils/snap";
+
 import {
   ConnectButton,
   InstallFlaskButton,
   ReconnectButton,
   SendVerifiableDataButton,
   Card,
-  SendNotificationButton,
-} from '../components';
+} from "../components";
+import { ShareDataButton } from "../components/Buttons";
 
 const Container = styled.div`
   display: flex;
@@ -42,7 +42,8 @@ const Heading = styled.h1`
 `;
 
 const Span = styled.span`
-  color: ${(props) => props.theme.colors.primary.default};
+  /* color: ${(props) => props.theme.colors.primary.default}; */
+  color: #de2121;
 `;
 
 const Subtitle = styled.p`
@@ -121,39 +122,47 @@ const Index = () => {
     }
   };
 
-  const handleSendVeriableDataClick = async () => {
+  const [notice, setNotice] = useState(`
+            Ethereum Racing can only access data that you allow via Xtreamly.
+  `);
+
+  // const handleSendVeriableDataClick = async () => {
+  //   try {
+  //     await sendVerifiableData();
+  //   } catch (e) {
+  //     console.error(e);
+  //     dispatch({ type: MetamaskActions.SetError, payload: e });
+  //   }
+  // };
+
+  // const handleSendNotificationClick = async () => {
+  //   try {
+  //     await sendNotification();
+  //   } catch (e) {
+  //     console.error(e);
+  //     dispatch({ type: MetamaskActions.SetError, payload: e });
+  //   }
+  // };
+
+  const handleShareDataClick = async () => {
+    let car = "";
     try {
-      await sendVerifiableData();
+      car = await sendNotification();
     } catch (e) {
       console.error(e);
       dispatch({ type: MetamaskActions.SetError, payload: e });
     }
-  };
-
-  const handleSendNotificationClick = async () => {
-    try {
-      await sendNotification();
-    } catch (e) {
-      console.error(e);
-      dispatch({ type: MetamaskActions.SetError, payload: e });
-    }
-  };
-
-  const handleSendNotificationRemoteClick = async () => {
-    try {
-      await sendNotificationRemote();
-    } catch (e) {
-      console.error(e);
-      dispatch({ type: MetamaskActions.SetError, payload: e });
+    if (car) {
+      setNotice(`Your favorite car is ${car}`);
     }
   };
 
   return (
     <Container>
       <Heading>
-        Welcome to <Span>Xtreamly</Span>
+        <Span>🏁 Ethereum Racing 🏁</Span>
       </Heading>
-      <Subtitle>One account to rull them all</Subtitle>
+      <Subtitle>Gran Turismo but in Web3</Subtitle>
       <CardContainer>
         {state.error && (
           <ErrorMessage>
@@ -163,9 +172,9 @@ const Index = () => {
         {!state.isFlask && (
           <Card
             content={{
-              title: 'Install',
+              title: "Install",
               description:
-                'You need to install MetaMask Flask in order to use Xtreamly',
+                "You need to install MetaMask Flask in order to login",
               button: <InstallFlaskButton />,
             }}
             fullWidth
@@ -174,8 +183,8 @@ const Index = () => {
         {!state.installedSnap && (
           <Card
             content={{
-              title: 'Connect',
-              description: 'Get started by connecting to Xtreamly snap',
+              title: "Sign in",
+              description: "Sign in with Xtreamly",
               button: (
                 <ConnectButton
                   onClick={handleConnectClick}
@@ -189,9 +198,9 @@ const Index = () => {
         {shouldDisplayReconnectButton(state.installedSnap) && (
           <Card
             content={{
-              title: 'Reconnect',
+              title: "Reconnect",
               description:
-                'While connected to a local running snap this button will always be displayed in order to update the snap if a change is made.',
+                "While connected to a local running snap this button will always be displayed in order to update the snap if a change is made.",
               button: (
                 <ReconnectButton
                   onClick={handleConnectClick}
@@ -204,48 +213,12 @@ const Index = () => {
         )}
         <Card
           content={{
-            title: 'Send Verifiable Data',
+            title: "Share Data",
             description:
-              'In the popup, enter your data to be stored in blockchain',
+              "You are asked to choose what data you want to give access to Ethereum Racing",
             button: (
-              <SendVerifiableDataButton
-                onClick={handleSendVeriableDataClick}
-                disabled={!state.installedSnap}
-              />
-            ),
-          }}
-          disabled={!state.installedSnap}
-          fullWidth={
-            state.isFlask &&
-            Boolean(state.installedSnap) &&
-            !shouldDisplayReconnectButton(state.installedSnap)
-          }
-        />
-        <Card
-          content={{
-            title: 'Send To Canister',
-            description: 'Display a custom message as notification',
-            button: (
-              <SendNotificationButton
-                onClick={handleSendNotificationClick}
-                disabled={!state.installedSnap}
-              />
-            ),
-          }}
-          disabled={!state.installedSnap}
-          fullWidth={
-            state.isFlask &&
-            Boolean(state.installedSnap) &&
-            !shouldDisplayReconnectButton(state.installedSnap)
-          }
-        />
-        <Card
-          content={{
-            title: 'Send To Canister Remote',
-            description: 'Display a custom message as notification',
-            button: (
-              <SendNotificationButton
-                onClick={handleSendNotificationRemoteClick}
+              <ShareDataButton
+                onClick={handleShareDataClick}
                 disabled={!state.installedSnap}
               />
             ),
@@ -258,10 +231,7 @@ const Index = () => {
           }
         />
         <Notice>
-          <p>
-            Note that Xtreamly is currently in alpha. Do not use it with your
-            main account
-          </p>
+          <p>{notice}</p>
         </Notice>
       </CardContainer>
     </Container>

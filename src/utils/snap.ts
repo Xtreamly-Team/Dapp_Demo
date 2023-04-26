@@ -73,13 +73,15 @@ export const sendVerifiableData = async () => {
 
 export const sendNotification = async () => {
   console.log('Going to invoke notif on snap!!');
-  await window.ethereum.request({
+  const res =await window.ethereum.request({
     method: 'wallet_invokeSnap',
     params: {
       snapId: defaultSnapOrigin,
       request: { method: 'notif' },
     },
   });
+  console.log(res);
+  return res;
 };
 
 export const sendNotificationRemote = async () => {
